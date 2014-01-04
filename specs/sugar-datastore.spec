@@ -1,7 +1,7 @@
 %define version 0.101.0
-%define release_number 4
-%define release_date 20140104
-%define shortcommit a104f30
+%define release_number 1
+%define release_date @release_date@
+%define shortcommit @shortcommit@
 
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
