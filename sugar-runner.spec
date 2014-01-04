@@ -17,6 +17,9 @@ BuildRequires: glib2-devel
 BuildRequires: gobject-introspection-devel
 BuildRequires: libX11-devel
 BuildRequires: libXrandr-devel
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 Requires: sugar
 Requires: xorg-x11-server-Xephyr
 

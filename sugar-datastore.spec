@@ -1,5 +1,5 @@
 %define version 0.101.0
-%define release_number 1
+%define release_number 4
 %define release_date 20140104
 %define shortcommit a104f30
 
@@ -16,6 +16,9 @@ URL: http://sugarlabs.org/
 Source0: https://api.github.com/repos/sugarlabs/%{name}/tarball/%{shortcommit}
 
 BuildRequires: python-devel
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 Requires: xapian-bindings-python
 
 %description

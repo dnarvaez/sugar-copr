@@ -23,6 +23,8 @@ BuildRequires: intltool
 BuildRequires: perl-XML-Parser
 BuildRequires: pkgconfig
 BuildRequires: python
+BuildRequires: autoconf
+BuildRequires: automake
 
 Requires: avahi-tools
 Requires: dbus-x11

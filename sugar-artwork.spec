@@ -20,6 +20,9 @@ BuildRequires: python
 BuildRequires: python-empy
 BuildRequires: icon-naming-utils
 BuildRequires: icon-slicer
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 
 Requires: gtk2 gtk3
 

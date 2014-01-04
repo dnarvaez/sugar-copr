@@ -27,6 +27,9 @@ BuildRequires: pkgconfig
 BuildRequires: python-devel
 BuildRequires: pygtk2-codegen
 BuildRequires: pygobject2-devel
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 
 Requires: dbus-python
 Requires: gettext
