@@ -56,7 +56,7 @@ function buildSRPM(module, callback) {
 }
 
 function startCoprBuild(module, callback) {
-    var rpmPath = path.join('rpmbuild', 'SRPM', module.name +
+    var rpmPath = path.join('SRPM', module.name +
                             '-' + module.version +
                             '-' + module.releaseNumber +
                             '.' + module.releaseDate +
