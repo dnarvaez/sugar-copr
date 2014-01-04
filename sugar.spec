@@ -13,7 +13,6 @@ URL:     http://sugarlabs.org/
 License: GPLv2+
 Group:   User Interface/Desktops
 Source0: https://api.github.com/repos/sugarlabs/%{name}/tarball/%{shortcommit}
-Patch0:  sugar-gnomekeyring.patch
 
 BuildRequires: gettext
 BuildRequires: GConf2-devel
