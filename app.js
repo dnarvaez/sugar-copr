@@ -63,7 +63,7 @@ function startCoprBuild(module, callback) {
                             'git' + module.commit +
                             'fc20.src.rpm');
 
-    var rpmUrl = 'http://95.85.29.189:3000/' + rpmPath;
+    var rpmUrl = 'http://95.85.29.189:3000/static/' + rpmPath;
 
     var apiUrl = 'http://copr-fe.cloud.fedoraproject.org' +
                  '/api/coprs/dnarvaez/sugar/new_build/';
