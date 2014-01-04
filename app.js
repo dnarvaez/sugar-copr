@@ -11,24 +11,25 @@ app.use(express.bodyParser());
 app.use('/static', express.static('rpmbuild'));
 app.use('/static', express.directory('rpmbuild'));
 
-function getSpecPath(module) {
-    return path.join('rpmbuild', "SPECS", module + '.spec');
-}
-
 function ensureTopDir() {
-    fs.mkdirSync("./rpmbuild")
-    fs.mkdirSync("./rpmbuild/SOURCES")
-    fs.mkdirSync("./rpmbuild/SPECS")
+    try {
+        fs.mkdirSync("./rpmbuild");
+        fs.mkdirSync("./rpmbuild/SOURCES");
+        fs.mkdirSync("./rpmbuild/SPECS");
+    } catch(err) {
+    }
 }
 
-function createSpec(module, commit, callback) {
-    var sourcePath = path.join('specs', module + '.spec');
+function createSpec(module, callback) {
+    var sourcePath = path.join('specs', module.name + '.spec');
 
-    fs.readFile(sourcePath, {encoding: 'utf8'}, function (err, data) {
-        data = data.replace("@shortcommit@", commit);
-        data = data.replace("@release_date@", moment().format("YYYYMMDD"));
+    fs.readFile(sourcePath, {encoding: 'utf8'}, function (error, data) {
+        data = data.replace("@version@", module.version);
+        data = data.replace("@shortcommit@", module.commit);
+        data = data.replace("@release_date@", module.releaseDate);
+        data = data.replace("@release_number@", module.releaseNumber);
 
-        fs.writeFile(getSpecPath(module), data, function (err) {
+        fs.writeFile(module.specPath, data, function (err) {
             callback(null);
         });
     });
@@ -37,7 +38,7 @@ function createSpec(module, commit, callback) {
 function downloadSource(module, callback) {
     var command = 'spectool -g ' +
                   '-C ' + path.join('rpmbuild', 'SOURCES') +
-                  ' ' + getSpecPath(module);
+                  ' ' + module.specPath;
 
     child_process.exec(command, function(error, stdout, stderr) {
         callback(null);
@@ -46,7 +47,7 @@ function downloadSource(module, callback) {
 
 function buildSRPM(module, callback) {
     var command = 'rpmbuild' +
-                  ' -bs ' + getSpecPath(module) +
+                  ' -bs ' + module.specPath +
                   ' -D \'_topdir ' + './rpmbuild\'';
 
     child_process.exec(command, function(error, stdout, stderr) {
@@ -54,9 +55,12 @@ function buildSRPM(module, callback) {
     });
 }
 
-function startCoprBuild(module, commit, callback) {
-    var rpmPath = path.join('rpmbuild', 'SRPM', module +
-                            '-0.101.0-1.20140104git' + commit +
+function startCoprBuild(module, callback) {
+    var rpmPath = path.join('rpmbuild', 'SRPM', module.name +
+                            '-' + module.version +
+                            '-' + module.releaseNumber +
+                            '.' + module.releaseDate +
+                            'git' + module.commit +
                             'fc20.src.rpm');
 
     var rpmUrl = 'http://95.85.29.189:3000/' + rpmPath;
@@ -73,16 +77,61 @@ function startCoprBuild(module, commit, callback) {
     });
 }
 
+function fetchVersion(module, callback) {
+    var url = 'https://raw.github.com/sugarlabs/' +
+              'sugar-datastore/' + module.commit + '/configure.ac';
+    
+    rest.get(url).on('complete', function(data, response) {
+        callback(null, /AC_INIT\(\[[^\]]+],\[([^\]]+)/g.exec(data)[1]);
+    });
+}
+
+function getReleaseNumber(module, callback) {
+    var jsonPath = 'releases.json';
+
+    fs.readFile(jsonPath, {encoding: 'utf8'}, function (error, data) {
+        var releases = {};
+
+        if (!error) {
+            releases = JSON.parse(data);
+        }
+
+        if (releases[module.name] === undefined) {
+            releases[module.name] = 1; 
+        } else {
+            releases[module.name]++;
+        }
+
+        data = JSON.stringify(releases);
+
+        fs.writeFile(jsonPath, data, function (error) {
+            callback(null, releases[module.name]);
+        });
+    });
+} 
+
 app.post('/api/build/:module/:commit', function (request, response) {
-    var module = request.params.module;
-    var commit = request.params.commit;
+    var module = {};
+
+    module.name = request.params.module;
+    module.commit = request.params.commit;
+    module.releaseDate = moment().format("YYYYMMDD");
+    module.specPath = path.join('rpmbuild', "SPECS", module.name + '.spec');
 
     response.send(200);
 
-    createSpec(module, commit, function (error) {
-        downloadSource(module, function (error) {
-            buildSRPM(module, function (error) {
-                startCoprBuild(module, commit, function (error) {
+    fetchVersion(module, function(error, version) {
+        module.version = version; 
+
+        getReleaseNumber(module, function(error, releaseNumber) {
+            module.releaseNumber = releaseNumber;
+
+            createSpec(module, function (error) {
+                downloadSource(module, function (error) {
+                    buildSRPM(module, function (error) {
+                        startCoprBuild(module, function (error) {
+                        });
+                    });
                 });
             });
         });

@@ -1,7 +1,7 @@
-%define version 0.101.0
-%define release_number 1
-%define release_date 20140104
-%define shortcommit 5d364de
+%define version @version@
+%define release_number @release_number@
+%define release_date @release_date@
+%define shortcommit @shortcommit@
 
 Summary: Artwork for Sugar look-and-feel
 Name: sugar-artwork
