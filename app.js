@@ -110,15 +110,13 @@ function getReleaseNumber(module, callback) {
     });
 } 
 
-app.post('/api/build/:module/:commit', function (request, response) {
+function buildModule(name, commit) {
     var module = {};
 
-    module.name = request.params.module;
-    module.commit = request.params.commit;
+    module.name = name;
+    module.commit = commit;
     module.releaseDate = moment().format("YYYYMMDD");
     module.specPath = path.join('rpmbuild', "SPECS", module.name + '.spec');
-
-    response.send(200);
 
     fetchVersion(module, function(error, version) {
         module.version = version; 
@@ -136,6 +134,17 @@ app.post('/api/build/:module/:commit', function (request, response) {
             });
         });
     });
+}
+
+app.post('/api/github', function (request, response){
+    var payload = JSON.parse(request.body.payload);
+    buildModule(payload.repository.name, payload.head_commit.id);
+    response.send(200);
+});
+
+app.post('/api/build/:name/:commit', function (request, response) {
+    buildModule(request.params.name, request.params.commit);
+    response.send(200);
 });
 
 ensureTopDir();
