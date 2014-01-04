@@ -139,7 +139,7 @@ function buildModule(name, commit) {
 app.post('/api/github', function (request, response){
     var payload = JSON.parse(request.body.payload);
     buildModule(payload.repository.name,
-                payload.head_commit.id.splice(0, 7));
+                payload.head_commit.id.slice(0, 7));
     response.send(200);
 });
 
