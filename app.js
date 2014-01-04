@@ -56,12 +56,12 @@ function buildSRPM(module, callback) {
 }
 
 function startCoprBuild(module, callback) {
-    var rpmPath = path.join('SRPM', module.name +
+    var rpmPath = path.join('SRPMS', module.name +
                             '-' + module.version +
                             '-' + module.releaseNumber +
                             '.' + module.releaseDate +
                             'git' + module.commit +
-                            'fc20.src.rpm');
+                            '.fc20.src.rpm');
 
     var rpmUrl = 'http://95.85.29.189:3000/static/' + rpmPath;
 
