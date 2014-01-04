@@ -61,7 +61,7 @@ function startCoprBuild(module, callback) {
                             '-' + module.releaseNumber +
                             '.' + module.releaseDate +
                             'git' + module.commit +
-                            '.fc20.src.rpm');
+                            '.fc19.src.rpm');
 
     var rpmUrl = 'http://95.85.29.189:3000/static/' + rpmPath;
 
