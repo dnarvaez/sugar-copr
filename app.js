@@ -4,6 +4,7 @@ var rest = require('restler');
 var moment = require('moment');
 var fs = require('fs');
 var path = require('path');
+var config = require('./config')
 
 var app = express();
 
@@ -68,9 +69,9 @@ function startCoprBuild(module, callback) {
     var apiUrl = 'http://copr-fe.cloud.fedoraproject.org' +
                  '/api/coprs/dnarvaez/sugar/new_build/';
 
-    var options = { 'data': {'pkgs': rpmUrl},
-                    'username': 'pcilfugjuvtpxtkgidle',
-                    'password': 'rfgpcvynsuztzycghbayglfzxacijy'};
+    var options = {'data': {'pkgs': rpmUrl},
+                   'username': config.username,
+                   'password': config.password};
 
     rest.post(apiUrl, options).on('complete', function(data, response) {
         callback(null);
