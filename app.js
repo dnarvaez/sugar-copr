@@ -78,9 +78,8 @@ function startCoprBuild(module, callback) {
 }
 
 function fetchVersion(module, callback) {
-    var url = 'https://raw.github.com/sugarlabs/' +
-              'sugar-datastore/' + module.commit + '/configure.ac';
-    
+    var url = 'https://raw.github.com/sugarlabs/' + module.name +
+              '/' + module.commit + '/configure.ac';
     rest.get(url).on('complete', function(data, response) {
         callback(null, /AC_INIT\(\[[^\]]+],\[([^\]]+)/g.exec(data)[1]);
     });
