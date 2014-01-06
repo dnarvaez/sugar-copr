@@ -63,7 +63,7 @@ function getSRPMUrl(module) {
                             '-' + module.releaseNumber +
                             '.' + module.releaseDate +
                             'git' + module.commit +
-                            '.fc19.src.rpm');
+                            '.fc20.src.rpm');
 
     return 'http://jita.sugarlabs.org:3000/out/' + rpmPath;
 }
