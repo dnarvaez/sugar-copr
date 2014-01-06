@@ -73,7 +73,7 @@ function startMockBuild(module, rootName, host, callback) {
                   '-b ' + host +
                   '-r ' + root +
                   '--destdir ' + './results' +
-                  getSRPMUrl();
+                  getSRPMUrl(module);
 
     child_process.exec(command, function(error, stdout, stderr) {
         if (callback) {
@@ -86,7 +86,7 @@ function startCoprBuild(module, callback) {
     var apiUrl = 'http://copr-fe.cloud.fedoraproject.org' +
                  '/api/coprs/dnarvaez/sugar/new_build/';
 
-    var options = {'data': {'pkgs': getSRPMUrl()},
+    var options = {'data': {'pkgs': getSRPMUrl(module)},
                    'username': config.username,
                    'password': config.password};
 
