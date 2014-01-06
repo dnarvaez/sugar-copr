@@ -129,6 +129,15 @@ function getReleaseNumber(module, callback) {
     });
 } 
 
+function startArmBuilds() {
+    startMockBuild(module, "fedora-18-armhfp", function (error) {
+        startMockBuild(module, "fedora-19-armhfp", function (error) {
+            startMockBuild(module, "fedora-20-armhfp", function (error) {
+            });
+        });
+    });
+}
+
 function buildModule(name, commit) {
     var module = {};
 
@@ -148,15 +157,7 @@ function buildModule(name, commit) {
                 downloadSource(module, function (error) {
                     buildSRPM(module, function (error) {
                         startCoprBuild(module);
-
-                        var roots = ['fedora-18-armhfp',
-                                     'fedora-19-armhfp',
-                                     'fedora-20-armhfp'];
-
-                        for (var i = 0; i < roots.length; i++) {
-                            startMockBuild(module, roots[i],
-                                           'bender.sugarlabs.org:2222');
-                        }
+                        startArmBuilds(module);
                     });
                 });
             });
