@@ -393,11 +393,6 @@ class Builder(object):
 
         errors = []
 
-        try:
-            socket.gethostbyname(self.hostname)
-        except socket.gaierror:
-            raise BuilderError('%s could not be resolved' % self.hostname)
-
         self.conn.module_name = "shell"
         self.conn.module_args = str("/bin/rpm -q mock rsync")
         res = self.conn.run()
