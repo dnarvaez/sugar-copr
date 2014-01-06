@@ -153,8 +153,8 @@ function buildModule(name, commit) {
                                      'fedora-19-armhfp',
                                      'fedora-20-armhfp'];
 
-                        for (var rootName in roots) {
-                            startMockBuild(module, rootName,
+                        for (var i = 0; i < roots.length; i++) {
+                            startMockBuild(module, roots[i],
                                            'bender.sugarlabs.org:2222');
                         }
                     });
