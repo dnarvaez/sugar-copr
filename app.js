@@ -73,7 +73,7 @@ function startMockBuild(module, rootName, host, callback) {
                   ' -b ' + host +
                   ' -r ' + rootName +
                   ' --destdir ' + './out' +
-                  getSRPMUrl(module);
+                  ' ' + getSRPMUrl(module);
 
     child_process.exec(command, function(error, stdout, stderr) {
         if (callback) {
