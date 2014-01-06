@@ -130,9 +130,10 @@ function getReleaseNumber(module, callback) {
 } 
 
 function startArmBuilds(module) {
-    startMockBuild(module, "fedora-18-armhfp", function (error) {
-        startMockBuild(module, "fedora-19-armhfp", function (error) {
-            startMockBuild(module, "fedora-20-armhfp", function (error) {
+    var host = "bender.sugarlabs.org:2222";
+    startMockBuild(module, "fedora-18-armhfp", host, function (error) {
+        startMockBuild(module, "fedora-19-armhfp", host, function (error) {
+            startMockBuild(module, "fedora-20-armhfp", host, function (error) {
             });
         });
     });
