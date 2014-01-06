@@ -368,8 +368,9 @@ class Builder(object):
         rpd = self._get_remote_pkg_dir(pkg)
         destdir = "'" + destdir.replace("'", "'\\''") + "'" # make spaces work w/our rsync command below :(
         # build rsync command line from the above
-        remote_src = '%s@%s:%s' % (self.username, self.hostname, rpd)
-        ssh_opts = "'ssh -o PasswordAuthentication=no -o StrictHostKeyChecking=no'"
+        hostname, port = self.hostname.split(":")
+        remote_src = '%s@%s:%s' % (self.username, hostname, rpd)
+        ssh_opts = "'ssh -p %s -o PasswordAuthentication=no -o StrictHostKeyChecking=no'" % port
         command = "%s -avH -e %s %s %s/" % (rsync, ssh_opts, remote_src, destdir)
         cmd = subprocess.Popen(command, shell=True,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
