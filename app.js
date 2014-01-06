@@ -4,19 +4,20 @@ var rest = require('restler');
 var moment = require('moment');
 var fs = require('fs');
 var path = require('path');
-var config = require('./config')
+var config = require('./config');
 
 var app = express();
 
 app.use(express.bodyParser());
-app.use('/static', express.static('rpmbuild'));
-app.use('/static', express.directory('rpmbuild'));
+app.use('/out', express.static('out'));
+app.use('/out', express.directory('out'));
 
-function ensureTopDir() {
+function setupOutDir() {
     try {
-        fs.mkdirSync("./rpmbuild");
-        fs.mkdirSync("./rpmbuild/SOURCES");
-        fs.mkdirSync("./rpmbuild/SPECS");
+        fs.mkdirSync("./out");
+        fs.mkdirSync("./out/rpmbuild");
+        fs.mkdirSync("./out/rpmbuild/SOURCES");
+        fs.mkdirSync("./out/rpmbuild/SPECS");
     } catch(err) {
     }
 }
@@ -38,7 +39,7 @@ function createSpec(module, callback) {
 
 function downloadSource(module, callback) {
     var command = 'spectool -g ' +
-                  '-C ' + path.join('rpmbuild', 'SOURCES') +
+                  '-C ' + path.join('out', 'rpmbuild', 'SOURCES') +
                   ' ' + module.specPath;
 
     child_process.exec(command, function(error, stdout, stderr) {
@@ -49,14 +50,14 @@ function downloadSource(module, callback) {
 function buildSRPM(module, callback) {
     var command = 'rpmbuild' +
                   ' -bs ' + module.specPath +
-                  ' -D \'_topdir ' + './rpmbuild\'';
+                  ' -D \'_topdir ' + './out/rpmbuild\'';
 
     child_process.exec(command, function(error, stdout, stderr) {
         callback(null);
     });
 }
 
-function startCoprBuild(module, callback) {
+function getSRPMUrl(module) {
     var rpmPath = path.join('SRPMS', module.name +
                             '-' + module.version +
                             '-' + module.releaseNumber +
@@ -64,17 +65,35 @@ function startCoprBuild(module, callback) {
                             'git' + module.commit +
                             '.fc19.src.rpm');
 
-    var rpmUrl = 'http://95.85.29.189:3000/static/' + rpmPath;
+    return 'http://95.85.29.189:3000/out/' + rpmPath;
+}
 
+function startMockBuild(module, rootName, host, callback) {
+    var command = 'python scripts/mockremote.py ' +
+                  '-b ' + host +
+                  '-r ' + root +
+                  '--destdir ' + './results' +
+                  getSRPMUrl();
+
+    child_process.exec(command, function(error, stdout, stderr) {
+        if (callback) {
+            callback(null);
+        }
+    });
+}
+
+function startCoprBuild(module, callback) {
     var apiUrl = 'http://copr-fe.cloud.fedoraproject.org' +
                  '/api/coprs/dnarvaez/sugar/new_build/';
 
-    var options = {'data': {'pkgs': rpmUrl},
+    var options = {'data': {'pkgs': getSRPMUrl()},
                    'username': config.username,
                    'password': config.password};
 
     rest.post(apiUrl, options).on('complete', function(data, response) {
-        callback(null);
+        if (callback) {
+            callback(null);
+        }
     });
 }
 
@@ -127,8 +146,15 @@ function buildModule(name, commit) {
             createSpec(module, function (error) {
                 downloadSource(module, function (error) {
                     buildSRPM(module, function (error) {
-                        startCoprBuild(module, function (error) {
-                        });
+                        startCoprBuild(module);
+
+                        var roots = ['fedora-18-armhfp',
+                                     'fedora-19-armhfp',
+                                     'fedora-20-armhfp'];
+
+                        for (var rootName in roots) {
+                            startMockBuild(module, rootName);
+                        }
                     });
                 });
             });

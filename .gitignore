@@ -1,4 +1,4 @@
-/rpmbuild/
+/out/
 /node_modules/
 /config.js
 /releases.json
