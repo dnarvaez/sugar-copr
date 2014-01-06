@@ -135,7 +135,8 @@ function buildModule(name, commit) {
     module.name = name;
     module.commit = commit;
     module.releaseDate = moment().format("YYYYMMDD");
-    module.specPath = path.join('rpmbuild', "SPECS", module.name + '.spec');
+    module.specPath = path.join('out', 'rpmbuild', "SPECS",
+                                module.name + '.spec');
 
     fetchVersion(module, function(error, version) {
         module.version = version; 
