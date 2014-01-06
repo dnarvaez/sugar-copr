@@ -129,7 +129,7 @@ function getReleaseNumber(module, callback) {
     });
 } 
 
-function startArmBuilds() {
+function startArmBuilds(module) {
     startMockBuild(module, "fedora-18-armhfp", function (error) {
         startMockBuild(module, "fedora-19-armhfp", function (error) {
             startMockBuild(module, "fedora-20-armhfp", function (error) {
