@@ -175,6 +175,6 @@ app.post('/api/build/:name/:commit', function (request, response) {
     response.send(200);
 });
 
-ensureTopDir();
+setupOutDir();
 
 app.listen(3000);
