@@ -65,7 +65,7 @@ function getSRPMUrl(module) {
                             'git' + module.commit +
                             '.fc19.src.rpm');
 
-    return 'http://95.85.29.189:3000/out/' + rpmPath;
+    return 'http://jita.sugarlabs.org:3000/out/' + rpmPath;
 }
 
 function startMockBuild(module, rootName, host, callback) {
@@ -73,7 +73,7 @@ function startMockBuild(module, rootName, host, callback) {
                   ' -b ' + host +
                   ' -r ' + rootName +
                   ' --destdir ' + './out' +
-                  ' -a http://95.85.29.189:3000/out/' +
+                  ' -a http://jita.sugarlabs.org:3000/out/' +
                   ' ' + getSRPMUrl(module);
 
     child_process.exec(command, function(error, stdout, stderr) {
