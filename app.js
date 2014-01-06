@@ -58,7 +58,7 @@ function buildSRPM(module, callback) {
 }
 
 function getSRPMUrl(module) {
-    var rpmPath = path.join('SRPMS', module.name +
+    var rpmPath = path.join('rpmbuild', 'SRPMS', module.name +
                             '-' + module.version +
                             '-' + module.releaseNumber +
                             '.' + module.releaseDate +
