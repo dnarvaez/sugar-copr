@@ -72,7 +72,7 @@ function startMockBuild(module, rootName, host, callback) {
     var command = 'python scripts/mockremote.py ' +
                   '-b ' + host +
                   '-r ' + rootName +
-                  '--destdir ' + './results' +
+                  '--destdir ' + './out' +
                   getSRPMUrl(module);
 
     child_process.exec(command, function(error, stdout, stderr) {
