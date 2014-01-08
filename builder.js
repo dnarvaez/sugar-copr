@@ -101,19 +101,9 @@ builder.Queue = function (builders) {
     var builds = [];
     var building = false;
 
-    builders = builders || {};
-
-    if (!builders.srpm) {
-        builders.srpm = SRPMBuilder();
-    }
-
-    if (!builders.copr) {
-        builders.copr = CoprBuilder();
-    }
-
-    if (!builders.mock) {
-        builders.mock = MockBuilder();
-    }
+    var srpmBuilder = SRPMBuilder();
+    var coprBuilder = CoprBuilder();
+    var mockBuilder = MockBuilder();
 
     function nextBuild() {
         var build = builds.pop();
@@ -125,13 +115,13 @@ builder.Queue = function (builders) {
 
         building = true;
 
-        builders.srpm.start(build.module, function (error, srpmUrl) {
+        srpmBuilder.start(build.module, function (error, srpmUrl) {
             if (build.useMock) {
-                builders.mock.start(build.root, srpmUrl, function () {
+                mockBuilder.start(build.root, srpmUrl, function () {
                     nextBuild();
                 });
             } else {
-                builders.copr.start(srpmUrl, function () {
+                coprBuilder.start(srpmUrl, function () {
                     nextBuild();
                 });
             }
