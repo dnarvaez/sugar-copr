@@ -20,9 +20,9 @@ function setupOutDir() {
     } catch (err) {}
 }
 
-function fetchVersion(module, callback) {
+function fetchVersion(module, commit, callback) {
     var url = 'https://raw.github.com/sugarlabs/' + module.name +
-        '/' + module.commit + '/configure.ac';
+        '/' + commit + '/configure.ac';
     rest.get(url).on('complete', function (data, response) {
         callback(null, /AC_INIT\(\[[^\]]+],\[([^\]]+)/g.exec(data)[1]);
     });
@@ -60,7 +60,7 @@ function buildModule(name, commit) {
     module.name = name;
     module.releaseDate = moment().format('YYYYMMDD');
 
-    fetchVersion(module, function (error, version) {
+    fetchVersion(module, commit, function (error, version) {
         module.version = version;
 
         getReleaseNumber(module, function (error, releaseNumber) {
