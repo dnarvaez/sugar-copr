@@ -73,18 +73,21 @@ function buildModule(name, commit) {
 
             builder.addBuild({module: module,
                               commit: commit,
+                              useMock: true,
                               root: {name: 'fedora',
                                      version: '18',
                                      arch: 'armhfp'}});
 
             builder.addBuild({module: module,
                               commit: commit,
+                              useMock: true,
                               root: {name: 'fedora',
                                      version: '19',
                                      arch: 'armhfp'}});
 
             builder.addBuild({module: module,
                               commit: commit,
+                              useMock: true,
                               root: {name: 'fedora',
                                      version: '20',
                                      arch: 'armhfp'}});
