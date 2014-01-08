@@ -21,7 +21,8 @@ builder.computeSRPMUrl = function(build) {
 
 builder.MockBuilder = function () {
     this.start = function (root, srpmUrl, callback) {
-        console.log('Building ' + srpmUrl + 'using mockremote, on ' + root);
+        console.log('Building ' + srpmUrl + 'using mockremote, on ' +
+                    root.name);
 
         var rootId = root.name +  '-' + root.version + '-' + root.arch;
 
@@ -154,7 +155,7 @@ builder.Queue = function (builders) {
 
     this.addBuild = function (build) {
         console.log('Build of ' + build.module.name + ' ' + build.commit +
-                    'added to the queue');
+                    ' on ' + build.commit + ' added to the queue');
 
         builds.push(build);
 
