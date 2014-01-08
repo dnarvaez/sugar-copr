@@ -33,7 +33,7 @@ describe('The builder module', function () {
 
     describe('MockBuilder', function () {
         beforeEach(function () {
-            spyOn(child_process, 'exec');
+            spyOn(child_process, 'spawn');
         });
 
         it('starts a build', function () {
@@ -41,13 +41,12 @@ describe('The builder module', function () {
 
             mockBuilder.start(testRoot, 'http://myhost/mysrpm.src.rpm');
 
-            expect(child_process.exec).toHaveBeenCalledWith(
-                'python scripts/mockremote.py ' +
-                '-b testarmhfpbuilder ' +
-                '-r fedora-20-armhfp ' +
-                '--destdir ./out ' +
-                '-a http://testhost/out/ ' +
-                'http://myhost/mysrpm.src.rpm', any(Function));
+            expect(child_process.spawn).toHaveBeenCalledWith(
+                'python',
+                ['scripts/mockremote.py', '-b', 'testarmhfpbuilder',
+                 '-r', 'fedora-20-armhfp', '--destdir', './out',
+                 '-a', 'http://testhost/out/',
+                'http://myhost/mysrpm.src.rpm'], any(Object), any(Function));
         });
     });
 
@@ -82,18 +81,21 @@ describe('The builder module', function () {
                     callback();
                 });
 
-            spyOn(child_process, 'exec').andCallFake(
-                function (command, callback) {
+            spyOn(child_process, 'spawn').andCallFake(
+                function (command, args, options, callback) {
                     switch (nCommand) {
                         case 0:
-                            expect(command).toEqual(
-                                'spectool -g -C out/rpmbuild/SOURCES' +
-                                ' out/rpmbuild/SPECS/test.spec');
+                            expect(command).toEqual('spectool');
+                            expect(args).toEqual(
+                                ['-g', '-C',
+                                 'out/rpmbuild/SOURCES',
+                                 'out/rpmbuild/SPECS/test.spec']);
                             break;
                         case 1:
-                            expect(command).toEqual(
-                                'rpmbuild -bs out/rpmbuild/SPECS/test.spec' +
-                                ' -D \'_topdir ./out/rpmbuild\'');
+                            expect(command).toEqual('rpmbuild');
+                            expect(args).toEqual(
+                                ['-bs', 'out/rpmbuild/SPECS/test.spec',
+                                 '-D', '\'_topdir ./out/rpmbuild\'']);
                     }
 
                     nCommand++;

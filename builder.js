@@ -26,18 +26,17 @@ builder.MockBuilder = function () {
 
         var rootId = root.name +  '-' + root.version + '-' + root.arch;
 
-        var command = 'python scripts/mockremote.py' +
-                      ' -b ' + config.builders[root.arch] +
-                      ' -r ' + rootId +
-                      ' --destdir ' + './out' +
-                      ' -a http://' + config.hostName + '/out/' +
-                      ' ' + srpmUrl;
+        var args = ['scripts/mockremote.py', '-b',
+                    config.builders[root.arch], '-r', rootId,
+                    '--destdir', './out', '-a',
+                    'http://' + config.hostName + '/out/', srpmUrl];
 
-        child_process.exec(command, function (error, stdout, stderr) {
-            if (callback) {
-                callback(error);
-            }
-        });
+        child_process.spawn('python', args, { stdio: 'inherit' },
+            function (error, stdout, stderr) {
+                if (callback) {
+                    callback(error);
+                }
+            });
     };
 };
 
@@ -64,23 +63,23 @@ builder.SRPMBuilder = function () {
     }
 
     function downloadSource(module, callback) {
-        var command = 'spectool -g ' +
-            '-C ' + path.join('out', 'rpmbuild', 'SOURCES') +
-            ' ' + getSpecPath(module);
+        var args = ['-g', '-C', path.join('out', 'rpmbuild', 'SOURCES'),
+                    getSpecPath(module)];
 
-        child_process.exec(command, function (error, stdout, stderr) {
-            callback(null);
-        });
+        child_process.spawn('spectool', args, {stdio: 'inherit'},
+            function (error, stdout, stderr) {
+                callback(null);
+            });
     }
 
     function buildSRPM(module, callback) {
-        var command = 'rpmbuild' +
-            ' -bs ' + getSpecPath(module) +
-            ' -D \'_topdir ' + './out/rpmbuild\'';
+        var args = ['-bs', getSpecPath(module), '-D',
+                    '\'_topdir ' + './out/rpmbuild\''];
 
-        child_process.exec(command, function (error, stdout, stderr) {
-            callback(null);
-        });
+        child_process.spawn('rpmbuild', args, {stdio: 'inherit'},
+            function (error, stdout, stderr) {
+                callback(null);
+            });
     }
 
     this.start = function (module, commit, callback) {
