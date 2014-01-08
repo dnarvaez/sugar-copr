@@ -131,7 +131,7 @@ describe('The builder module', function () {
             spyOn(builder, 'SRPMBuilder').andCallFake(function () {
                 var mock = {};
 
-                mock.start = function(module, callback) {
+                mock.start = function(module, commit, callback) {
                     setTimeout(function () {
                         callback();
                     }, 1);

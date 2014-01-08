@@ -137,7 +137,7 @@ builder.Queue = function (builders) {
         srpmUrl = builder.computeSRPMUrl(build);
 
         var srpmBuilder = new builder.SRPMBuilder();
-        srpmBuilder.start(build.module, function (error) {
+        srpmBuilder.start(build.module, build.commit, function (error) {
             if (build.useMock) {
                 var mockBuilder = new builder.MockBuilder();
                 mockBuilder.start(build.root, srpmUrl, function () {
