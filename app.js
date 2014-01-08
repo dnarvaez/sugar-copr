@@ -179,6 +179,23 @@ app.post('/api/build/:name/:commit', function (request, response) {
     response.send(200);
 });
 
+app.get('/repo/:name', function (request, response) {
+    var name = request.params.name;
+    var baseUrl = "http://copr.fedoraproject.org/results/dnarvaez/sugar/";
+
+    if(name.indexOf("armhfp") > -1) {
+        baseUrl = "http://jita.sugarlabs.org:3000/out/";
+    }
+
+    response.send("[sugar]\n" +
+                  "name=Sugar\n" +
+                  "description=Sugar Learning Platform\n" +
+                  "baseurl=" + baseUrl + name + "\n" +
+                  "skip_if_unavailable=True\n" +
+                  "gpgcheck=0\n" +
+                  "enabled=1\n");
+});
+
 setupOutDir();
 
 app.listen(3000);
