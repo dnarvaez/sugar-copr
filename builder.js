@@ -67,8 +67,8 @@ builder.SRPMBuilder = function () {
         });
     }
 
-    this.start = function (module, callback) {
-        createSpec(module, function (error) {
+    this.start = function (module, commit, callback) {
+        createSpec(module, commit, function (error) {
             downloadSource(module, function (error) {
                 buildSRPM(module, callback);
             });
@@ -101,10 +101,6 @@ builder.Queue = function (builders) {
     var builds = [];
     var building = false;
 
-    var srpmBuilder = SRPMBuilder();
-    var coprBuilder = CoprBuilder();
-    var mockBuilder = MockBuilder();
-
     function nextBuild() {
         var build = builds.pop();
 
@@ -115,12 +111,15 @@ builder.Queue = function (builders) {
 
         building = true;
 
+        var srpmBuilder = builder.SRPMBuilder();
         srpmBuilder.start(build.module, function (error, srpmUrl) {
             if (build.useMock) {
+                var mockBuilder = builder.MockBuilder();
                 mockBuilder.start(build.root, srpmUrl, function () {
                     nextBuild();
                 });
             } else {
+                var coprBuilder = builder.CoprBuilder();
                 coprBuilder.start(srpmUrl, function () {
                     nextBuild();
                 });

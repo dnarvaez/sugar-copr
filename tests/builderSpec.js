@@ -7,8 +7,11 @@ describe('The builder module', function () {
     var testModule = {name: 'test',
                       version: '1',
                       releaseDate: '20140502',
-                      releaseNumber: '2',
-                      commit: '333333333333333333'};
+                      releaseNumber: '2'};
+
+    var testRoot = {name: 'fedora',
+                    version: '20',
+                    arch: 'armhfp'};
 
     describe('MockBuilder', function () {
         beforeEach(function () {
@@ -16,13 +19,9 @@ describe('The builder module', function () {
         });
 
         it('starts a build', function () {
-            var root = {'name': 'fedora',
-                        'version': '20',
-                        'arch': 'armhfp'};
+            var mockBuilder = new builder.MockBuilder();
 
-            var mockBuilder = new builder.MockBuilder(root);
-
-            mockBuilder.start('http://myhost/mysrpm.src.rpm');
+            mockBuilder.start(testRoot, 'http://myhost/mysrpm.src.rpm');
 
             expect(child_process.exec).toHaveBeenCalledWith(
                 'python scripts/mockremote.py ' +
@@ -84,7 +83,8 @@ describe('The builder module', function () {
                     callback();
                 });
 
-            srpmBuilder.start(testModule, function () {});
+            srpmBuilder.start(testModule, '333333333333333333',
+                              function () {});
         });
     });
 
@@ -107,7 +107,98 @@ describe('The builder module', function () {
     });
 
     describe('Queue', function () {
+        beforeEach(function () {
+            jasmine.Clock.useMock();
+
+            spyOn(builder, 'SRPMBuilder').andCallFake(function () {
+                var mock = {};
+
+                mock.start = function(module, callback) {
+                    setTimeout(function () {
+                        callback();
+                    }, 1);
+                };
+
+                return mock;
+            });
+
+            spyOn(builder, 'MockBuilder').andCallFake(function () {
+                var mock = {};
+
+                mock.start = function(root, srpmUrl, callback) {
+                    setTimeout(function () {
+                        callback();
+                    }, 1);
+                };
+
+                return mock;
+            });
+
+            spyOn(builder, 'CoprBuilder').andCallFake(function () {
+                var mock = {};
+
+                mock.start = function(srpmUrl, callback) {
+                    setTimeout(function () {
+                        callback();
+                    }, 1);
+                };
+
+                return mock;
+            });
+        });
+
+        it('starts an srpm build', function () {
+            var queue = new builder.Queue();
+            queue.addBuild({module: testModule,
+                            commit: "4444444444444444"});
+
+            jasmine.Clock.tick(1);
+
+            expect(builder.SRPMBuilder).toHaveBeenCalled();
+        });
+
         it('starts a copr build', function () {
+            var queue = new builder.Queue();
+            queue.addBuild({module: testModule,
+                            commit: "4444444444444444"});
+
+            jasmine.Clock.tick(2);
+
+            expect(builder.CoprBuilder).toHaveBeenCalled();
+            expect(builder.MockBuilder).not.toHaveBeenCalled();
+        });
+
+        it('starts a mock build', function () {
+            var queue = new builder.Queue();
+            queue.addBuild({module: testModule,
+                            commit: "4444444444444444",
+                            useMock: true,
+                            root: testRoot});
+
+            jasmine.Clock.tick(2);
+
+            expect(builder.CoprBuilder).not.toHaveBeenCalled();
+            expect(builder.MockBuilder).toHaveBeenCalled();
+        });
+
+        it('start builds in the right order', function () {
+            var queue = new builder.Queue();
+
+            queue.addBuild({module: testModule,
+                            commit: "4444444444444444"});
+
+            queue.addBuild({module: testModule,
+                            commit: "4444444444444444",
+                            useMock: true,
+                            root: testRoot});
+
+            jasmine.Clock.tick(1);
+
+            expect(builder.CoprBuilder).toHaveBeenCalled();
+
+            jasmine.Clock.tick(1);
+
+            expect(builder.MockBuilder).not.toHaveBeenCalled();
         });
     });
 
