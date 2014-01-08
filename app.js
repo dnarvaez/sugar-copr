@@ -1,6 +1,7 @@
 var express = require('express');
 var moment = require('moment');
 var fs = require('fs');
+var rest = require('rest');
 var builder = require('./builder');
 var config = require('./config-' + process.env.NODE_ENV);
 
