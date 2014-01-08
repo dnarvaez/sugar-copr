@@ -1,6 +1,6 @@
 {
   "name": "sugar-copr",
-  "description": "Automated copr builds",
+  "description": "Copr builds from sugar git",
   "version": "0.0.1",
   "private": true,
   "dependencies": {

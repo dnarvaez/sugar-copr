@@ -1,7 +1,0 @@
-var config = {}
-
-config.hostName = "fedora.sugarlabs.org";
-config.username = 'sadadojlknklfafa';
-config.password = 'jououofnklndaoio';
-
-module.exports = config;
