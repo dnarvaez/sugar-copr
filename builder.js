@@ -17,7 +17,7 @@ builder.computeSRPMUrl = function(build) {
         '.fc20.src.rpm');
 
         return 'http://' + config.hostName + '/out/' + rpmPath;
-}
+};
 
 builder.MockBuilder = function () {
     this.start = function (root, srpmUrl, callback) {

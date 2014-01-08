@@ -1,9 +1,7 @@
 var express = require('express');
-var child_process = require('child_process');
-var rest = require('restler');
 var moment = require('moment');
 var fs = require('fs');
-var path = require('path');
+var builder = require('./builder');
 var config = require('./config');
 
 var app = express();
@@ -19,88 +17,6 @@ function setupOutDir() {
         fs.mkdirSync('./out/rpmbuild/SOURCES');
         fs.mkdirSync('./out/rpmbuild/SPECS');
     } catch (err) {}
-}
-
-function createSpec(module, callback) {
-    var sourcePath = path.join('specs', module.name + '.spec');
-
-    fs.readFile(sourcePath, {
-        encoding: 'utf8'
-    }, function (error, data) {
-        data = data.replace('@version@', module.version);
-        data = data.replace('@shortcommit@', module.commit);
-        data = data.replace('@release_date@', module.releaseDate);
-        data = data.replace('@release_number@', module.releaseNumber);
-
-        fs.writeFile(module.specPath, data, function (err) {
-            callback(null);
-        });
-    });
-}
-
-function downloadSource(module, callback) {
-    var command = 'spectool -g ' +
-        '-C ' + path.join('out', 'rpmbuild', 'SOURCES') +
-        ' ' + module.specPath;
-
-    child_process.exec(command, function (error, stdout, stderr) {
-        callback(null);
-    });
-}
-
-function buildSRPM(module, callback) {
-    var command = 'rpmbuild' +
-        ' -bs ' + module.specPath +
-        ' -D \'_topdir ' + './out/rpmbuild\'';
-
-    child_process.exec(command, function (error, stdout, stderr) {
-        callback(null);
-    });
-}
-
-function getSRPMUrl(module) {
-    var rpmPath = path.join('rpmbuild', 'SRPMS', module.name +
-        '-' + module.version +
-        '-' + module.releaseNumber +
-        '.' + module.releaseDate +
-        'git' + module.commit +
-        '.fc20.src.rpm');
-
-    return 'http://' + config.hostName + '/out/' + rpmPath;
-}
-
-function startMockBuild(module, rootName, host, callback) {
-    var command = 'python scripts/mockremote.py' +
-        ' -b ' + host +
-        ' -r ' + rootName +
-        ' --destdir ' + './out' +
-        ' -a http://' + config.hostName + '/out/' +
-        ' ' + getSRPMUrl(module);
-
-    child_process.exec(command, function (error, stdout, stderr) {
-        if (callback) {
-            callback(null);
-        }
-    });
-}
-
-function startCoprBuild(module, callback) {
-    var apiUrl = 'http://copr-fe.cloud.fedoraproject.org' +
-        '/api/coprs/dnarvaez/sugar/new_build/';
-
-    var options = {
-        'data': {
-            'pkgs': getSRPMUrl(module)
-        },
-        'username': config.username,
-        'password': config.password
-    };
-
-    rest.post(apiUrl, options).on('complete', function (data, response) {
-        if (callback) {
-            callback(null);
-        }
-    });
 }
 
 function fetchVersion(module, callback) {
@@ -137,23 +53,11 @@ function getReleaseNumber(module, callback) {
     });
 }
 
-function startArmBuilds(module) {
-    var host = 'bender.sugarlabs.org:2222';
-    startMockBuild(module, 'fedora-18-armhfp', host, function (error) {
-        startMockBuild(module, 'fedora-19-armhfp', host, function (error) {
-            startMockBuild(module, 'fedora-20-armhfp', host, function (error) {});
-        });
-    });
-}
-
 function buildModule(name, commit) {
     var module = {};
 
     module.name = name;
-    module.commit = commit;
     module.releaseDate = moment().format('YYYYMMDD');
-    module.specPath = path.join('out', 'rpmbuild', 'SPECS',
-        module.name + '.spec');
 
     fetchVersion(module, function (error, version) {
         module.version = version;
@@ -161,14 +65,28 @@ function buildModule(name, commit) {
         getReleaseNumber(module, function (error, releaseNumber) {
             module.releaseNumber = releaseNumber;
 
-            createSpec(module, function (error) {
-                downloadSource(module, function (error) {
-                    buildSRPM(module, function (error) {
-                        startCoprBuild(module);
-                        startArmBuilds(module);
-                    });
-                });
-            });
+            var queue = builder.Queue();
+
+            builder.addBuild({module: module,
+                              commit: commit});
+
+            builder.addBuild({module: module,
+                              commit: commit,
+                              root: {name: 'fedora',
+                                     version: '18',
+                                     arch: 'armhfp'}});
+
+            builder.addBuild({module: module,
+                              commit: commit,
+                              root: {name: 'fedora',
+                                     version: '19',
+                                     arch: 'armhfp'}});
+
+            builder.addBuild({module: module,
+                              commit: commit,
+                              root: {name: 'fedora',
+                                     version: '20',
+                                     arch: 'armhfp'}});
         });
     });
 }
