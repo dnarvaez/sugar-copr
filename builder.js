@@ -21,7 +21,7 @@ builder.computeSRPMUrl = function(build) {
 
 builder.MockBuilder = function () {
     this.start = function (root, srpmUrl, callback) {
-        console.log('Building ' + srpmUrl + 'using mockremote, on ' +
+        console.log('Building ' + srpmUrl + ' using mockremote, on ' +
                     root.name);
 
         var rootId = root.name +  '-' + root.version + '-' + root.arch;
