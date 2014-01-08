@@ -14,10 +14,10 @@ app.use('/out', express.directory('out'));
 
 function setupOutDir() {
     try {
-        fs.mkdirSync("./out");
-        fs.mkdirSync("./out/rpmbuild");
-        fs.mkdirSync("./out/rpmbuild/SOURCES");
-        fs.mkdirSync("./out/rpmbuild/SPECS");
+        fs.mkdirSync('./out');
+        fs.mkdirSync('./out/rpmbuild');
+        fs.mkdirSync('./out/rpmbuild/SOURCES');
+        fs.mkdirSync('./out/rpmbuild/SPECS');
     } catch (err) {}
 }
 
@@ -27,10 +27,10 @@ function createSpec(module, callback) {
     fs.readFile(sourcePath, {
         encoding: 'utf8'
     }, function (error, data) {
-        data = data.replace("@version@", module.version);
-        data = data.replace("@shortcommit@", module.commit);
-        data = data.replace("@release_date@", module.releaseDate);
-        data = data.replace("@release_number@", module.releaseNumber);
+        data = data.replace('@version@', module.version);
+        data = data.replace('@shortcommit@', module.commit);
+        data = data.replace('@release_date@', module.releaseDate);
+        data = data.replace('@release_number@', module.releaseNumber);
 
         fs.writeFile(module.specPath, data, function (err) {
             callback(null);
@@ -138,10 +138,10 @@ function getReleaseNumber(module, callback) {
 }
 
 function startArmBuilds(module) {
-    var host = "bender.sugarlabs.org:2222";
-    startMockBuild(module, "fedora-18-armhfp", host, function (error) {
-        startMockBuild(module, "fedora-19-armhfp", host, function (error) {
-            startMockBuild(module, "fedora-20-armhfp", host, function (error) {});
+    var host = 'bender.sugarlabs.org:2222';
+    startMockBuild(module, 'fedora-18-armhfp', host, function (error) {
+        startMockBuild(module, 'fedora-19-armhfp', host, function (error) {
+            startMockBuild(module, 'fedora-20-armhfp', host, function (error) {});
         });
     });
 }
@@ -151,8 +151,8 @@ function buildModule(name, commit) {
 
     module.name = name;
     module.commit = commit;
-    module.releaseDate = moment().format("YYYYMMDD");
-    module.specPath = path.join('out', 'rpmbuild', "SPECS",
+    module.releaseDate = moment().format('YYYYMMDD');
+    module.specPath = path.join('out', 'rpmbuild', 'SPECS',
         module.name + '.spec');
 
     fetchVersion(module, function (error, version) {
@@ -187,19 +187,19 @@ app.post('/api/build/:name/:commit', function (request, response) {
 
 app.get('/repo/:name', function (request, response) {
     var name = request.params.name;
-    var baseUrl = "http://copr.fedoraproject.org/results/dnarvaez/sugar/";
+    var baseUrl = 'http://copr.fedoraproject.org/results/dnarvaez/sugar/';
 
-    if (name.indexOf("armhfp") > -1) {
-        baseUrl = "http://jita.sugarlabs.org:3000/out/";
+    if (name.indexOf('armhfp') > -1) {
+        baseUrl = 'http://jita.sugarlabs.org:3000/out/';
     }
 
-    response.send("[sugar]\n" +
-        "name=Sugar\n" +
-        "description=Sugar Learning Platform\n" +
-        "baseurl=" + baseUrl + name + "\n" +
-        "skip_if_unavailable=True\n" +
-        "gpgcheck=0\n" +
-        "enabled=1\n");
+    response.send('[sugar]\n' +
+        'name=Sugar\n' +
+        'description=Sugar Learning Platform\n' +
+        'baseurl=' + baseUrl + name + '\n' +
+        'skip_if_unavailable=True\n' +
+        'gpgcheck=0\n' +
+        'enabled=1\n');
 });
 
 setupOutDir();
