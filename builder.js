@@ -151,6 +151,9 @@ builder.Queue = function (builders) {
     }
 
     this.addBuild = function (build) {
+        console.log('Build of ' + build.module.name + ' ' + build.commit +
+                    'added to the queue');
+
         builds.push(build);
 
         if (!building) {
