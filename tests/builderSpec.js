@@ -13,6 +13,24 @@ describe('The builder module', function () {
                     version: '20',
                     arch: 'armhfp'};
 
+    var testMockBuild = {module: testModule,
+                         commit: "2222222",
+                         useMock: true,
+                         root: testRoot};
+
+    var testCoprBuild = {module: testModule,
+                         commit: "4444444"};
+
+    it('computes the srpm url', function () {
+        var srpmUrl = builder.computeSRPMUrl(testMockBuild);
+        expect(srpmUrl).toEqual('http://testhost/out/rpmbuild/SRPMS/' +
+                                'test-1-2.20140502git2222222.fc20.src.rpm');
+
+        srpmUrl = builder.computeSRPMUrl(testMockBuild);
+        expect(srpmUrl).toEqual('http://testhost/out/rpmbuild/SRPMS/' +
+                                'test-1-2.20140502git2222222.fc20.src.rpm');
+    });
+
     describe('MockBuilder', function () {
         beforeEach(function () {
             spyOn(child_process, 'exec');
@@ -149,18 +167,22 @@ describe('The builder module', function () {
 
         it('starts an srpm build', function () {
             var queue = new builder.Queue();
-            queue.addBuild({module: testModule,
-                            commit: "4444444444444444"});
+            queue.addBuild(testCoprBuild);
 
-            jasmine.Clock.tick(1);
+            jasmine.Clock.tick(2);
+
+            expect(builder.SRPMBuilder).toHaveBeenCalled();
+
+            queue.addBuild(testMockBuild);
+
+            jasmine.Clock.tick(2);
 
             expect(builder.SRPMBuilder).toHaveBeenCalled();
         });
 
         it('starts a copr build', function () {
             var queue = new builder.Queue();
-            queue.addBuild({module: testModule,
-                            commit: "4444444444444444"});
+            queue.addBuild(testCoprBuild);
 
             jasmine.Clock.tick(2);
 
@@ -170,10 +192,7 @@ describe('The builder module', function () {
 
         it('starts a mock build', function () {
             var queue = new builder.Queue();
-            queue.addBuild({module: testModule,
-                            commit: "4444444444444444",
-                            useMock: true,
-                            root: testRoot});
+            queue.addBuild(testMockBuild);
 
             jasmine.Clock.tick(2);
 
@@ -183,14 +202,8 @@ describe('The builder module', function () {
 
         it('start builds in the right order', function () {
             var queue = new builder.Queue();
-
-            queue.addBuild({module: testModule,
-                            commit: "4444444444444444"});
-
-            queue.addBuild({module: testModule,
-                            commit: "4444444444444444",
-                            useMock: true,
-                            root: testRoot});
+            queue.addBuild(testCoprBuild);
+            queue.addBuild(testMockBuild);
 
             jasmine.Clock.tick(1);
 

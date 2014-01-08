@@ -6,6 +6,19 @@ var config = require('./config-' + process.env.NODE_ENV || 'test');
 
 var builder = {};
 
+builder.computeSRPMUrl = function(build) {
+    var module = build.module;
+
+    var rpmPath = path.join('rpmbuild', 'SRPMS', module.name +
+        '-' + module.version +
+        '-' + module.releaseNumber +
+        '.' + module.releaseDate +
+        'git' + build.commit +
+        '.fc20.src.rpm');
+
+        return 'http://' + config.hostName + '/out/' + rpmPath;
+}
+
 builder.MockBuilder = function () {
     this.start = function (root, srpmUrl, callback) {
         var rootId = root.name +  '-' + root.version + '-' + root.arch;
@@ -113,8 +126,10 @@ builder.Queue = function (builders) {
 
         building = true;
 
+        srpmUrl = builder.computeSRPMUrl(build);
+
         var srpmBuilder = new builder.SRPMBuilder();
-        srpmBuilder.start(build.module, function (error, srpmUrl) {
+        srpmBuilder.start(build.module, function (error) {
             if (build.useMock) {
                 var mockBuilder = new builder.MockBuilder();
                 mockBuilder.start(build.root, srpmUrl, function () {
