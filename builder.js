@@ -21,6 +21,8 @@ builder.computeSRPMUrl = function(build) {
 
 builder.MockBuilder = function () {
     this.start = function (root, srpmUrl, callback) {
+        console.log('Building ' + srpmUrl + 'using mockremote, on ' + root);
+
         var rootId = root.name +  '-' + root.version + '-' + root.arch;
 
         var command = 'python scripts/mockremote.py' +
@@ -81,6 +83,8 @@ builder.SRPMBuilder = function () {
     }
 
     this.start = function (module, commit, callback) {
+        console.log('Building an srpm of ' + module.name + ' ' + commit);
+
         createSpec(module, commit, function (error) {
             downloadSource(module, function (error) {
                 buildSRPM(module, function (error) {
@@ -93,6 +97,8 @@ builder.SRPMBuilder = function () {
 
 builder.CoprBuilder = function () {
     this.start = function start(srpmUrl, callback) {
+        console.log('Start a copr build of ' + srpmUrl);
+
         var apiUrl = 'http://copr-fe.cloud.fedoraproject.org' +
             '/api/coprs/dnarvaez/sugar/new_build/';
 
