@@ -66,7 +66,7 @@ function getSRPMUrl(module) {
         'git' + module.commit +
         '.fc20.src.rpm');
 
-    return 'http://jita.sugarlabs.org:3000/out/' + rpmPath;
+    return 'http://' + config.hostName + '/out/' + rpmPath;
 }
 
 function startMockBuild(module, rootName, host, callback) {
@@ -74,7 +74,7 @@ function startMockBuild(module, rootName, host, callback) {
         ' -b ' + host +
         ' -r ' + rootName +
         ' --destdir ' + './out' +
-        ' -a http://jita.sugarlabs.org:3000/out/' +
+        ' -a http://' + config.hostName + '/out/' +
         ' ' + getSRPMUrl(module);
 
     child_process.exec(command, function (error, stdout, stderr) {
@@ -190,7 +190,7 @@ app.get('/repo/:name', function (request, response) {
     var baseUrl = 'http://copr.fedoraproject.org/results/dnarvaez/sugar/';
 
     if (name.indexOf('armhfp') > -1) {
-        baseUrl = 'http://jita.sugarlabs.org:3000/out/';
+        baseUrl = 'http://' + config.hostName + '/out/';
     }
 
     response.send('[sugar]\n' +
