@@ -88,7 +88,9 @@ builder.SRPMBuilder = function () {
         createSpec(module, commit, function (error) {
             downloadSource(module, function (error) {
                 buildSRPM(module, function (error) {
-                    callback(null);
+                    if (callback) {
+                        callback(null);
+                    }
                 });
             });
         });
