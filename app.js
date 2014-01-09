@@ -112,8 +112,8 @@ app.get('/repo/:name', function (request, response) {
         baseUrl = 'http://' + config.hostName + '/out/';
     }
 
-    response.send('[sugar]\n' +
-        'name=Sugar\n' +
+    response.send('[sugar-master]\n' +
+        'name=Sugar (master)\n' +
         'description=Sugar Learning Platform\n' +
         'baseurl=' + baseUrl + name + '\n' +
         'skip_if_unavailable=True\n' +
