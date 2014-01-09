@@ -79,6 +79,7 @@ describe('The builder module', function () {
                         '%define release_date 20140502\n' +
                         '%define shortcommit 333333333333333333\n');
 
+                    callback();
                 });
 
             spyOn(child_process, 'spawn').andCallFake(
