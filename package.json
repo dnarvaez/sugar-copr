@@ -6,6 +6,7 @@
   "dependencies": {
     "express": "3.x",
     "restler": "3.x",
-    "moment": "2.x"
+    "moment": "2.x",
+    "mkdirp": "0.3.5"
   }
 }

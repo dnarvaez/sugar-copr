@@ -1,6 +1,7 @@
 var express = require('express');
 var moment = require('moment');
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 var rest = require('restler');
 var builder = require('./builder');
 var config = require('./config-' + process.env.NODE_ENV);
@@ -12,12 +13,8 @@ app.use('/out', express.static('out'));
 app.use('/out', express.directory('out'));
 
 function setupOutDir() {
-    try {
-        fs.mkdirSync('./out');
-        fs.mkdirSync('./out/rpmbuild');
-        fs.mkdirSync('./out/rpmbuild/SOURCES');
-        fs.mkdirSync('./out/rpmbuild/SPECS');
-    } catch (err) {}
+    mkdirp.sync('./out/rpmbuild/SOURCES');
+    mkdirp.sync('./out/rpmbuild/SPECS');
 }
 
 function fetchVersion(module, commit, callback) {
