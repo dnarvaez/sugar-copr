@@ -1,4 +1,4 @@
 /out/
 /node_modules/
-/config.js
+/config-production.js
 /releases.json
