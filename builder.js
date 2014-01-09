@@ -76,7 +76,7 @@ builder.SRPMBuilder = function () {
 
     function buildSRPM(module, callback) {
         var args = ['-bs', getSpecPath(module), '-D',
-                    '\'_topdir ' + './out/rpmbuild\''];
+                    '_topdir ' + './out/rpmbuild'];
 
         var process = child_process.spawn('rpmbuild', args,
                                           {stdio: 'inherit'});

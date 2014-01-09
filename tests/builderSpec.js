@@ -95,7 +95,7 @@ describe('The builder module', function () {
                             expect(command).toEqual('rpmbuild');
                             expect(args).toEqual(
                                 ['-bs', 'out/rpmbuild/SPECS/test.spec',
-                                 '-D', '\'_topdir ./out/rpmbuild\'']);
+                                 '-D', '_topdir ./out/rpmbuild']);
                     }
 
                     nCommand++;
