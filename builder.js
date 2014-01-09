@@ -35,7 +35,7 @@ builder.MockBuilder = function () {
                                           { stdio: 'inherit' });
         process.on('close', function (code) {
             if (callback) {
-                callback(error);
+                callback(null);
             }
         });
     };
