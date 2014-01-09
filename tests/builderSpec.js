@@ -32,21 +32,22 @@ describe('The builder module', function () {
     });
 
     describe('MockBuilder', function () {
-        beforeEach(function () {
-            spyOn(child_process, 'spawn');
-        });
-
         it('starts a build', function () {
             var mockBuilder = new builder.MockBuilder();
 
-            mockBuilder.start(testRoot, 'http://myhost/mysrpm.src.rpm');
+            spyOn(child_process, 'spawn').andCallFake(
+                function (command, args, options) {
+                    expect(command).toEqual('python');
+                    expect(args).toEqual(
+                        ['scripts/mockremote.py', '-b', 'testarmhfpbuilder',
+                         '-r', 'fedora-20-armhfp', '--destdir', './out',
+                         '-a', 'http://testhost/out/',
+                         'http://myhost/mysrpm.src.rpm']);
 
-            expect(child_process.spawn).toHaveBeenCalledWith(
-                'python',
-                ['scripts/mockremote.py', '-b', 'testarmhfpbuilder',
-                 '-r', 'fedora-20-armhfp', '--destdir', './out',
-                 '-a', 'http://testhost/out/',
-                'http://myhost/mysrpm.src.rpm'], any(Object), any(Function));
+                    return {on: function() {}};
+            });
+
+            mockBuilder.start(testRoot, 'http://myhost/mysrpm.src.rpm');
         });
     });
 
@@ -64,7 +65,7 @@ describe('The builder module', function () {
                 });
         });
 
-        it('builds an rpm', function () {
+        it('builds a srpm', function () {
             var srpmBuilder = new builder.SRPMBuilder();
             var nCommand = 0;
 
@@ -78,11 +79,10 @@ describe('The builder module', function () {
                         '%define release_date 20140502\n' +
                         '%define shortcommit 333333333333333333\n');
 
-                    callback();
                 });
 
             spyOn(child_process, 'spawn').andCallFake(
-                function (command, args, options, callback) {
+                function (command, args, options) {
                     switch (nCommand) {
                         case 0:
                             expect(command).toEqual('spectool');
@@ -100,7 +100,7 @@ describe('The builder module', function () {
 
                     nCommand++;
 
-                    callback();
+                    return {on: function() {}};
                 });
 
             srpmBuilder.start(testModule, '333333333333333333',
@@ -216,5 +216,4 @@ describe('The builder module', function () {
             expect(builder.MockBuilder).not.toHaveBeenCalled();
         });
     });
-
 });

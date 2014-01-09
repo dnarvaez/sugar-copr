@@ -31,12 +31,13 @@ builder.MockBuilder = function () {
                     '--destdir', './out', '-a',
                     'http://' + config.hostName + '/out/', srpmUrl];
 
-        child_process.spawn('python', args, { stdio: 'inherit' },
-            function (error, stdout, stderr) {
-                if (callback) {
-                    callback(error);
-                }
-            });
+        var process = child_process.spawn('python', args,
+                                          { stdio: 'inherit' });
+        process.on('close', function (code) {
+            if (callback) {
+                callback(error);
+            }
+        });
     };
 };
 
@@ -66,20 +67,22 @@ builder.SRPMBuilder = function () {
         var args = ['-g', '-C', path.join('out', 'rpmbuild', 'SOURCES'),
                     getSpecPath(module)];
 
-        child_process.spawn('spectool', args, {stdio: 'inherit'},
-            function (error, stdout, stderr) {
+        var process = child_process.spawn('spectool', args,
+                                          {stdio: 'inherit'});
+        process.on('close', function (code) {
                 callback(null);
-            });
+        });
     }
 
     function buildSRPM(module, callback) {
         var args = ['-bs', getSpecPath(module), '-D',
                     '\'_topdir ' + './out/rpmbuild\''];
 
-        child_process.spawn('rpmbuild', args, {stdio: 'inherit'},
-            function (error, stdout, stderr) {
-                callback(null);
-            });
+        var process = child_process.spawn('rpmbuild', args,
+                                          {stdio: 'inherit'});
+        process.on('close', function (code) {
+            callback(null);
+        });
     }
 
     this.start = function (module, commit, callback) {
