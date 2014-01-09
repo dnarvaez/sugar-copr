@@ -106,7 +106,8 @@ app.post('/api/build/:name/:commit', function (request, response) {
 
 app.get('/repo/:name', function (request, response) {
     var name = request.params.name;
-    var baseUrl = 'http://copr.fedoraproject.org/results/dnarvaez/sugar/';
+    var baseUrl = 'http://copr-be.cloud.fedoraproject.org' +
+                  '/results/dnarvaez/sugar/';
 
     if (name.indexOf('armhfp') > -1) {
         baseUrl = 'http://' + config.hostName + '/out/';
