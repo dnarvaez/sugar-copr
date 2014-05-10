@@ -193,29 +193,38 @@ if (update-mime-database -v &> /dev/null); then
   update-mime-database "%{_datadir}/mime" > /dev/null
 fi
 
+if [ $1 -eq 0 ] ; then
+  /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
+fi
+
+%posttrans
+  /usr/bin/glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
+
 %files -f %{name}.lang
 %doc COPYING
-
 %config %{_sysconfdir}/dbus-1/system.d/nm-user-settings.conf
 %config %{_sysconfdir}/gconf/schemas/sugar.schemas
-
-%dir %{_datadir}/sugar
-%dir %{_datadir}/sugar/activities
-%{_datadir}/sugar/*
+%{_bindir}/sugar*
+%{_datadir}/GConf/gsettings/sugar-schemas.convert
+%{_datadir}/glib-2.0/schemas/org.sugarlabs.gschema.xml
+%{_datadir}/mime/packages/sugar.xml
+%{_datadir}/xsessions/sugar.desktop
 
 %{python_sitelib}/*
 
-%{_datadir}/xsessions/sugar.desktop
-%{_datadir}/GConf/gsettings/sugar-schemas.convert
-%{_datadir}/glib-2.0/schemas/org.sugarlabs.gschema.xml
+%dir %{_datadir}/sugar
+%dir %{_datadir}/sugar/activities
+%dir %{_datadir}/sugar/extensions
+%dir %{_datadir}/sugar/extensions/cpsection
 
-%{_bindir}/*
-%dir %{_datadir}/sugar/extensions/cpsection/
-%exclude %{_datadir}/sugar/extensions/cpsection/[b-z]*
+%{_datadir}/sugar/data
+%{_datadir}/sugar/extensions/deviceicon
+%{_datadir}/sugar/extensions/globalkey
+%{_datadir}/sugar/extensions/webservice
+%{_datadir}/sugar/extensions/cpsection/*.py*
 %{_datadir}/sugar/extensions/cpsection/aboutcomputer
 %{_datadir}/sugar/extensions/cpsection/aboutme
-
-%{_datadir}/mime/packages/sugar.xml
+%exclude %{_datadir}/sugar/extensions/cpsection/[b-z]*
 
 %files cp-all
 

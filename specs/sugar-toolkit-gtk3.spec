@@ -64,8 +64,6 @@ make %{?_smp_mflags} V=1
 %install
 make install DESTDIR=%{buildroot}
 
-mkdir -p %{buildroot}/%{_sysconfdir}/rpm/
-
 %find_lang %name
 
 #Remove libtool archives.
